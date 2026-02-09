@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haneul LOL chang 내전 매니저</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>하늘고 6기 롤창 내전 매니저</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -33,6 +33,11 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             font-family: 'Noto Sans KR', -apple-system, sans-serif;
             background: var(--bg-base);
@@ -45,26 +50,30 @@
         .app-header {
             background: var(--bg-surface);
             border-bottom: 1px solid var(--border);
-            padding: 0 24px;
+            padding: 0 12px;
             position: sticky;
             top: 0;
             z-index: 100;
             backdrop-filter: blur(12px);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
+        .app-header::-webkit-scrollbar { display: none; }
         .header-inner {
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
             align-items: center;
-            height: 56px;
-            gap: 4px;
+            height: 52px;
+            gap: 2px;
+            min-width: max-content;
         }
         .logo {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14px;
             letter-spacing: -0.03em;
-            margin-right: 32px;
+            margin-right: 20px;
             white-space: nowrap;
         }
         .logo .lo-main { color: var(--text-primary); }
@@ -74,7 +83,7 @@
             background: transparent;
             color: var(--text-muted);
             border: none;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: var(--radius-sm);
             cursor: pointer;
             font-weight: 600;
@@ -85,16 +94,12 @@
             position: relative;
         }
         .nav-btn:hover { color: var(--text-secondary); background: rgba(255,255,255,0.04); }
-        .nav-btn.active {
-            color: var(--text-primary);
-            background: rgba(255,255,255,0.06);
-        }
+        .nav-btn.active { color: var(--text-primary); background: rgba(255,255,255,0.06); }
         .nav-btn.active::after {
             content: '';
             position: absolute;
-            bottom: -9px;
-            left: 14px;
-            right: 14px;
+            bottom: -8px;
+            left: 12px; right: 12px;
             height: 2px;
             background: var(--accent-blue);
             border-radius: 1px;
@@ -104,11 +109,14 @@
         .app-body {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 28px 24px 60px;
+            padding: 24px 16px 60px;
+            overflow-x: hidden;
         }
         .view-section {
             display: none;
             animation: viewIn 0.25s ease-out;
+            width: 100%;
+            overflow-x: hidden;
         }
         @keyframes viewIn {
             from { opacity: 0; transform: translateY(8px); }
@@ -158,6 +166,8 @@
             font-size: 13px;
             transition: border-color 0.15s;
             outline: none;
+            min-width: 0;
+            max-width: 100%;
         }
         input:focus, select:focus { border-color: var(--accent-blue); }
         input::placeholder { color: var(--text-dim); }
@@ -219,8 +229,9 @@
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 16px;
             position: relative;
+            overflow: hidden;
         }
         .team-card::before {
             content: '';
@@ -235,27 +246,33 @@
         .team-label {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .team-card.blue .team-label { color: var(--accent-blue); }
         .team-card.red .team-label { color: var(--accent-red); }
 
-        .player-row { display: flex; gap: 6px; margin-bottom: 8px; }
+        .player-row { display: flex; gap: 6px; margin-bottom: 6px; }
         .player-row:last-child { margin-bottom: 0; }
-        .player-input, .champ-input { flex: 1; font-size: 12px; padding: 8px 10px; }
+        .player-input, .champ-input {
+            flex: 1;
+            font-size: 12px;
+            padding: 7px 8px;
+            min-width: 0;
+            width: 0;
+        }
 
         /* Winner Selector */
         .winner-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             margin: 20px 0;
         }
         .win-btn {
-            padding: 10px 32px;
+            padding: 10px 28px;
             font-weight: 700;
             font-size: 13px;
             border: 1px solid;
@@ -277,22 +294,28 @@
             justify-content: center;
             gap: 10px;
             margin-bottom: 32px;
+            flex-wrap: wrap;
         }
 
         /* Match Log Table */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
         table {
             width: 100%;
+            min-width: 560px;
             border-collapse: separate;
             border-spacing: 0;
             background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
         }
         th {
             background: var(--bg-card);
             color: var(--text-muted);
-            padding: 12px;
+            padding: 12px 8px;
             text-align: center;
             font-weight: 700;
             font-size: 11px;
@@ -301,10 +324,10 @@
             font-family: 'JetBrains Mono', monospace;
         }
         td {
-            padding: 12px;
+            padding: 10px 8px;
             text-align: center;
             border-bottom: 1px solid var(--border);
-            font-size: 13px;
+            font-size: 12px;
         }
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover { background: rgba(255,255,255,0.02); }
@@ -312,14 +335,14 @@
         .team-cell {
             display: flex;
             flex-direction: column;
-            gap: 3px;
-            font-size: 12px;
+            gap: 2px;
+            font-size: 11px;
         }
-        .team-cell small { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .team-cell small { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 10px; }
         .result-badge {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.04em;
         }
         .result-badge.blue { color: var(--accent-blue); }
@@ -359,7 +382,11 @@
             gap: 8px;
             align-items: center;
             margin-bottom: 24px;
+            flex-wrap: wrap;
         }
+        .player-form-row input { flex: 1; min-width: 120px; }
+        .player-form-row select { min-width: 120px; }
+
         .tier-badge {
             font-family: 'JetBrains Mono', monospace;
             padding: 3px 8px;
@@ -374,6 +401,14 @@
         .tier-G { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.25); }
         .tier-S { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
 
+        .player-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+
         /* ===== TEAM MAKER ===== */
         .tm-input-grid {
             display: grid;
@@ -381,7 +416,7 @@
             gap: 8px;
             margin-bottom: 20px;
         }
-        .tm-input-grid input { font-size: 12px; }
+        .tm-input-grid input { font-size: 12px; width: 100%; }
         .tm-teams-wrap {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -509,9 +544,7 @@
             padding: 7px 0; border-bottom: 1px solid var(--border);
         }
         .stat-row:last-child { border-bottom: none; }
-        .stat-row-name {
-            font-size: 12px; font-weight: 700; min-width: 80px; color: #cbd5e1;
-        }
+        .stat-row-name { font-size: 12px; font-weight: 700; min-width: 70px; color: #cbd5e1; }
         .stat-row-val {
             font-size: 10px; color: var(--text-dim);
             min-width: 46px; text-align: right;
@@ -529,7 +562,7 @@
         .match-item:last-child { border-bottom: none; }
         .m-date { color: var(--text-dim); min-width: 36px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
         .m-res { font-weight: 800; min-width: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-        .m-champ { font-weight: 700; color: var(--text-primary); min-width: 60px; font-size: 11px; }
+        .m-champ { font-weight: 700; color: var(--text-primary); min-width: 50px; font-size: 11px; }
         .m-mates { color: var(--text-dim); flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
 
         /* ===== ROULETTE ===== */
@@ -537,14 +570,14 @@
             display: flex; gap: 8px; flex-wrap: wrap;
             justify-content: center; margin-bottom: 24px;
         }
-        .roulette-inputs input { width: 140px; font-size: 12px; }
+        .roulette-inputs input { width: 130px; font-size: 12px; }
         .roulette-display {
             text-align: center;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 900;
             color: var(--accent-gold);
-            min-height: 60px;
+            min-height: 50px;
             margin: 20px 0 24px;
         }
 
@@ -564,14 +597,37 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .app-body { padding: 16px 12px 40px; }
-            .header-inner { gap: 0; }
-            .logo { margin-right: 12px; font-size: 13px; }
+            .app-body { padding: 16px 10px 40px; }
+            .logo { margin-right: 10px; font-size: 12px; }
             .nav-btn { padding: 6px 8px; font-size: 11px; }
-            .match-grid, .tm-input-grid, .tm-teams-wrap { grid-template-columns: 1fr; }
+
+            .page-title { font-size: 17px; }
+
+            /* 홈 - 매치 입력 1열로 */
+            .match-grid { grid-template-columns: 1fr; gap: 12px; }
+            .team-card { padding: 12px; }
+            .player-row { gap: 4px; }
+            .player-input, .champ-input { padding: 7px 6px; font-size: 11px; }
+
+            .win-btn { padding: 9px 20px; font-size: 12px; }
+
+            /* 테이블 스크롤 */
+            .table-wrap { border-radius: var(--radius-md); }
+
+            /* 선수명단 */
+            .player-form-row { gap: 6px; }
+            .player-form-row input { min-width: 0; }
+
+            /* 팀짜기 */
+            .tm-input-grid { grid-template-columns: 1fr; }
+            .tm-teams-wrap { grid-template-columns: 1fr; gap: 12px; }
+
+            /* 전적분석 1열 */
             .stat-grid.two { grid-template-columns: 1fr; }
-            .player-form-row { flex-direction: column; align-items: stretch; }
+
+            /* 룰렛 */
             .roulette-inputs input { width: 100%; }
+            .roulette-display { font-size: 28px; }
         }
     </style>
 </head>
@@ -579,7 +635,7 @@
 
 <header class="app-header">
     <div class="header-inner">
-        <div class="logo"><span class="lo-main">Haneul LOL</span><span class="lo-accent"> MANAGER</span></div>
+        <div class="logo"><span class="lo-main">LOL</span><span class="lo-accent"> MANAGER</span></div>
         <button class="nav-btn active" onclick="showView('main')">홈</button>
         <button class="nav-btn" onclick="showView('stats')">전적 분석</button>
         <button class="nav-btn" onclick="showView('player')">선수 명단</button>
@@ -623,10 +679,12 @@
         </div>
 
         <div class="section-title">Recent Matches</div>
-        <table id="logTable">
-            <thead><tr><th width="12%">날짜</th><th width="32%">블루팀</th><th width="10%">결과</th><th width="32%">레드팀</th><th width="14%">관리</th></tr></thead>
-            <tbody><tr><td colspan="5" style="color:var(--text-dim)">로딩 중...</td></tr></tbody>
-        </table>
+        <div class="table-wrap">
+            <table id="logTable">
+                <thead><tr><th width="12%">날짜</th><th width="32%">블루팀</th><th width="10%">결과</th><th width="32%">레드팀</th><th width="14%">관리</th></tr></thead>
+                <tbody><tr><td colspan="5" style="color:var(--text-dim)">로딩 중...</td></tr></tbody>
+            </table>
+        </div>
         <div class="pagination">
             <button class="page-btn" onclick="changePage(-1)">이전</button>
             <span id="pageIndicator" class="page-info">1 / 1</span>
@@ -636,7 +694,7 @@
 
     <!-- STATS -->
     <div id="statsView" class="view-section">
-        <div id="statsContent" class="stat-container">
+        <div id="statsContent">
             <div style="text-align:center; padding:40px; color:var(--text-dim);">데이터 로딩 중...</div>
         </div>
     </div>
@@ -646,7 +704,7 @@
         <div class="page-title">Player Roster</div>
         <div class="page-sub">선수 등록 및 티어 관리</div>
         <div class="player-form-row">
-            <input type="text" id="newPlayerName" placeholder="소환사명" style="width:180px;">
+            <input type="text" id="newPlayerName" placeholder="소환사명">
             <select id="newPlayerTier">
                 <option value="D1">Diamond 1</option><option value="D2">Diamond 2</option><option value="D3">Diamond 3</option><option value="D4">Diamond 4</option>
                 <option value="E1">Emerald 1</option><option value="E2">Emerald 2</option><option value="E3">Emerald 3</option><option value="E4">Emerald 4</option>
@@ -656,16 +714,18 @@
             </select>
             <button class="btn-primary" onclick="savePlayer()">저장</button>
         </div>
-        <table id="playerTable">
-            <thead><tr><th>소환사</th><th>티어</th><th>점수</th><th>관리</th></tr></thead>
-            <tbody><tr><td colspan="4" style="color:var(--text-dim)">...</td></tr></tbody>
-        </table>
+        <div class="player-table-wrap">
+            <table id="playerTable">
+                <thead><tr><th>소환사</th><th>티어</th><th>점수</th><th>관리</th></tr></thead>
+                <tbody><tr><td colspan="4" style="color:var(--text-dim)">...</td></tr></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- TEAM MAKER -->
     <div id="teamMakerView" class="view-section">
         <div class="page-title">Team Balancer</div>
-        <div class="page-sub">티어점수 30% + 승률 70% 기반 MMR 밸런싱 (뭐 꼬우면 말하소 바꿀랑께)</div>
+        <div class="page-sub">티어점수 30% + 승률 70% 기반 MMR 밸런싱 (꼬우면 말하소 값 수정 해드림)</div>
         <div class="tm-input-grid" id="tmInputGrid"></div>
         <div class="action-row">
             <button class="btn-primary" onclick="makeBalancedTeam()">밸런스 팀 생성</button>
@@ -726,6 +786,7 @@
     let matches = [];
     let playerDB = [];
     let selectedWinner = null;
+    let minGamesFilter = 5;
     let editingId = null;
     let currentPage = 1;
     const itemsPerPage = 5;
@@ -736,7 +797,6 @@
     initTeamMakerInputs();
     fetchData();
 
-    // === NAV ===
     function showView(viewId) {
         document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
         document.getElementById(viewId + 'View').style.display = 'block';
@@ -832,7 +892,7 @@
             pageData.forEach(m => {
                 const w = m.winner==='Blue';
                 const row = `<tr>
-                    <td style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted)">${m.date}</td>
+                    <td style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted)">${m.date}</td>
                     <td class="team-cell">${m.blue.map(p=>`<div>${formatName(p.name)} <small>${p.champ}</small></div>`).join('')}</td>
                     <td><span class="result-badge ${w?'blue':'red'}">${w?'BLUE':'RED'}</span></td>
                     <td class="team-cell">${m.red.map(p=>`<div>${formatName(p.name)} <small>${p.champ}</small></div>`).join('')}</td>
@@ -1019,7 +1079,7 @@
 
         const statsList = Object.entries(ps)
             .map(([n,s])=>({n,...s,t:s.w+s.l,r:pct(s.w,s.l)}))
-            .filter(p=>p.t>=5)
+            .filter(p=>p.t>=minGamesFilter)
             .sort((a,b)=>b.r-a.r||b.t-a.t);
 
         const blueWins = matches.filter(m=>m.winner==="Blue").length;
@@ -1033,7 +1093,7 @@
         h += `<div class="stat-grid ${selectedStatPlayer?'two':'one'}">`;
 
         // Rankings
-        h += `<div class="card"><div class="stat-title">Rankings (5G+)</div>`;
+        h += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="stat-title" style="margin-bottom:0;">Rankings</div><select onchange="changeMinGames(this.value)" style="padding:4px 8px;font-size:11px;"><option value="3" ${minGamesFilter===3?'selected':''}>3판 이상</option><option value="5" ${minGamesFilter===5?'selected':''}>5판 이상</option><option value="10" ${minGamesFilter===10?'selected':''}>10판 이상</option></select></div>`;
         statsList.forEach((p,i)=>{
             const active = selectedStatPlayer===p.n?'active':'';
             const rankCls = i<3?'stat-rank-top':'stat-rank-norm';
@@ -1053,7 +1113,7 @@
             const mates=Object.entries(cur.with).map(([m,s])=>({m,...s,t:s.w+s.l,r:pct(s.w,s.l)})).filter(d=>d.t>=2).sort((a,b)=>b.r-a.r||b.t-a.t);
             const userGames=matches.filter(g=>[...g.blue,...g.red].some(p=>p.name===selectedStatPlayer)).sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id-a.id);
 
-            h+=`<div>`;
+            h+=`<div id="statDetailCol">`;
             // Profile
             h+=`<div class="card"><div class="sel-profile">
                 <div class="summary-badge" style="background:linear-gradient(135deg,${wrc(curR)}22,${wrc(curR)}08);border:2px solid ${wrc(curR)}33;color:${wrc(curR)}">${curR.toFixed(0)}</div>
@@ -1088,10 +1148,20 @@
         h+=`</div>`;
         document.getElementById('statsContent').innerHTML=h;
     }
+    function changeMinGames(val) {
+    minGamesFilter = parseInt(val);
+    renderStatsDashboard();
+    }
 
     function selectStatPlayer(name){
         selectedStatPlayer=(selectedStatPlayer===name)?null:name;
         renderStatsDashboard();
+        if(selectedStatPlayer) {
+            setTimeout(() => {
+                const detail = document.getElementById('statDetailCol');
+                if(detail) detail.scrollIntoView({ behavior:'smooth', block:'start' });
+            }, 50);
+        }
     }
 
     // === ROULETTE ===
