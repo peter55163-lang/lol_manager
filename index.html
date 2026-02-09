@@ -1121,7 +1121,7 @@
             </div>${makeBar(cur.w,cur.l,8)}</div>`;
             // Champions
             h+=`<div class="card"><div class="stat-title">Most Champions</div>`;
-            champs.slice(0,10).forEach(c=>{
+            champs.forEach(c=>{
                 h+=`<div class="stat-row"><span class="stat-row-name">${c.c}</span><div style="flex:1">${makeBar(c.w,c.l)}</div><span class="stat-row-val">${c.w}W ${c.l}L</span></div>`;
             });
             h+=`</div>`;
