@@ -786,7 +786,7 @@
     let matches = [];
     let playerDB = [];
     let selectedWinner = null;
-    let minGamesFilter = 5;
+    let minGamesFilter = 1;
     let editingId = null;
     let currentPage = 1;
     const itemsPerPage = 5;
@@ -1093,7 +1093,7 @@
         h += `<div class="stat-grid ${selectedStatPlayer?'two':'one'}">`;
 
         // Rankings
-        h += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="stat-title" style="margin-bottom:0;">Rankings</div><select onchange="changeMinGames(this.value)" style="padding:4px 8px;font-size:11px;"><option value="3" ${minGamesFilter===3?'selected':''}>3판 이상</option><option value="5" ${minGamesFilter===5?'selected':''}>5판 이상</option><option value="10" ${minGamesFilter===10?'selected':''}>10판 이상</option></select></div>`;
+        h += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="stat-title" style="margin-bottom:0;">Rankings</div><select onchange="changeMinGames(this.value)" style="padding:4px 8px;font-size:11px;"><option value="1" ${minGamesFilter===1?'selected':''}>1판 이상</option><option value="3" ${minGamesFilter===3?'selected':''}>3판 이상</option><option value="5" ${minGamesFilter===5?'selected':''}>5판 이상</option><option value="10" ${minGamesFilter===10?'selected':''}>10판 이상</option></select></div>`;
         statsList.forEach((p,i)=>{
             const active = selectedStatPlayer===p.n?'active':'';
             const rankCls = i<3?'stat-rank-top':'stat-rank-norm';
