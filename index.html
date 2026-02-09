@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haneul LOL chang 내전 매니저</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #030712;
+            --bg-surface: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --border: #1e293b;
+            --border-light: #334155;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+            --accent-blue: #3b82f6;
+            --accent-blue-soft: rgba(59,130,246,0.15);
+            --accent-red: #ef4444;
+            --accent-red-soft: rgba(239,68,68,0.15);
+            --accent-gold: #f59e0b;
+            --accent-gold-soft: rgba(245,158,11,0.12);
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HEADER / NAV ===== */
+        .app-header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 56px;
+            gap: 4px;
+        }
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: -0.03em;
+            margin-right: 32px;
+            white-space: nowrap;
+        }
+        .logo .lo-main { color: var(--text-primary); }
+        .logo .lo-accent { color: var(--accent-blue); }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.15s;
+            white-space: nowrap;
+            position: relative;
+        }
+        .nav-btn:hover { color: var(--text-secondary); background: rgba(255,255,255,0.04); }
+        .nav-btn.active {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.06);
+        }
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 14px;
+            right: 14px;
+            height: 2px;
+            background: var(--accent-blue);
+            border-radius: 1px;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+        }
+        .view-section {
+            display: none;
+            animation: viewIn 0.25s ease-out;
+        }
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== SHARED COMPONENTS ===== */
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 16px;
+        }
+        .page-title {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .page-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+        .card + .card { margin-top: 16px; }
+
+        input, select {
+            background: var(--bg-base);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 13px;
+            transition: border-color 0.15s;
+            outline: none;
+        }
+        input:focus, select:focus { border-color: var(--accent-blue); }
+        input::placeholder { color: var(--text-dim); }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
+
+        .btn-mini {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.15s;
+        }
+        .btn-mini:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-mini.danger { color: var(--accent-red); border-color: rgba(239,68,68,0.3); }
+        .btn-mini.danger:hover { background: var(--accent-red-soft); }
+
+        /* ===== HOME VIEW - MATCH INPUT ===== */
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .team-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+        }
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .team-card.blue::before { background: var(--accent-blue); }
+        .team-card.red::before { background: var(--accent-red); }
+
+        .team-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .team-card.blue .team-label { color: var(--accent-blue); }
+        .team-card.red .team-label { color: var(--accent-red); }
+
+        .player-row { display: flex; gap: 6px; margin-bottom: 8px; }
+        .player-row:last-child { margin-bottom: 0; }
+        .player-input, .champ-input { flex: 1; font-size: 12px; padding: 8px 10px; }
+
+        /* Winner Selector */
+        .winner-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .win-btn {
+            padding: 10px 32px;
+            font-weight: 700;
+            font-size: 13px;
+            border: 1px solid;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            transition: all 0.15s;
+            font-family: inherit;
+            opacity: 0.5;
+        }
+        .win-btn.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .win-btn.red { border-color: var(--accent-red); color: var(--accent-red); }
+        .win-btn.selected { opacity: 1; }
+        .win-btn.selected.blue { background: var(--accent-blue); color: white; }
+        .win-btn.selected.red { background: var(--accent-red); color: white; }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        /* Match Log Table */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        th {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            padding: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+        .team-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 12px;
+        }
+        .team-cell small { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .result-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+        .result-badge.blue { color: var(--accent-blue); }
+        .result-badge.red { color: var(--accent-red); }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .page-btn {
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 12px;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .page-btn:hover { background: var(--bg-card); border-color: var(--border-light); }
+        .page-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===== PLAYER VIEW ===== */
+        .player-form-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .tier-badge {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .tier-D { background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
+        .tier-E { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+        .tier-P { background: rgba(45,212,191,0.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+        .tier-G { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.25); }
+        .tier-S { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+
+        /* ===== TEAM MAKER ===== */
+        .tm-input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tm-input-grid input { font-size: 12px; }
+        .tm-teams-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .tm-team {
+            background: var(--bg-base);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border-top: 2px solid transparent;
+        }
+        .tm-team.blue { border-color: var(--accent-blue); }
+        .tm-team.red { border-color: var(--accent-red); }
+        .tm-team-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .tm-player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .tm-player:last-child { border-bottom: none; }
+        .tm-player-info { display: flex; flex-direction: column; }
+        .tm-player-calc {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .tm-player-score {
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        .tm-diff {
+            text-align: center;
+            margin-top: 16px;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .tm-score-total {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== STATS DASHBOARD ===== */
+        .stat-grid { display: grid; gap: 16px; align-items: start; }
+        .stat-grid.two { grid-template-columns: 280px 1fr; }
+        .stat-grid.one { grid-template-columns: 1fr; }
+
+        .stat-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .player-list-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 10px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.12s;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+            text-align: left;
+            font-family: inherit;
+        }
+        .player-list-btn:hover { background: var(--bg-card); }
+        .player-list-btn.active { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); }
+
+        .stat-rank-num {
+            font-size: 11px;
+            font-weight: 800;
+            width: 18px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-rank-top { color: #fbbf24; }
+        .stat-rank-norm { color: var(--text-dim); }
+
+        .stat-pname { font-size: 13px; font-weight: 700; }
+        .stat-psub { font-size: 10px; color: var(--text-dim); margin-top: 1px; font-family: 'JetBrains Mono', monospace; }
+
+        .bar-wrap { display: flex; align-items: center; gap: 6px; width: 100%; }
+        .bar-bg { flex: 1; height: 5px; background: var(--bg-card); border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 3px; transition: width 0.35s; }
+        .bar-pct { font-size: 10px; font-weight: 700; min-width: 32px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+        .summary-badge {
+            width: 52px; height: 52px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sel-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+
+        .stat-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 0; border-bottom: 1px solid var(--border);
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-row-name {
+            font-size: 12px; font-weight: 700; min-width: 80px; color: #cbd5e1;
+        }
+        .stat-row-val {
+            font-size: 10px; color: var(--text-dim);
+            min-width: 46px; text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .history-scroll { max-height: 380px; overflow-y: auto; }
+        .history-scroll::-webkit-scrollbar { width: 4px; }
+        .history-scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+        .match-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 0; border-bottom: 1px solid var(--border);
+            font-size: 11px;
+        }
+        .match-item:last-child { border-bottom: none; }
+        .m-date { color: var(--text-dim); min-width: 36px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+        .m-res { font-weight: 800; min-width: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .m-champ { font-weight: 700; color: var(--text-primary); min-width: 60px; font-size: 11px; }
+        .m-mates { color: var(--text-dim); flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
+
+        /* ===== ROULETTE ===== */
+        .roulette-inputs {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            justify-content: center; margin-bottom: 24px;
+        }
+        .roulette-inputs input { width: 140px; font-size: 12px; }
+        .roulette-display {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--accent-gold);
+            min-height: 60px;
+            margin: 20px 0 24px;
+        }
+
+        /* ===== HOST BADGE ===== */
+        .host-mark {
+            display: inline-block;
+            background: var(--accent-gold-soft);
+            color: var(--accent-gold);
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            vertical-align: middle;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .app-body { padding: 16px 12px 40px; }
+            .header-inner { gap: 0; }
+            .logo { margin-right: 12px; font-size: 13px; }
+            .nav-btn { padding: 6px 8px; font-size: 11px; }
+            .match-grid, .tm-input-grid, .tm-teams-wrap { grid-template-columns: 1fr; }
+            .stat-grid.two { grid-template-columns: 1fr; }
+            .player-form-row { flex-direction: column; align-items: stretch; }
+            .roulette-inputs input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <div class="logo"><span class="lo-main">Haneul LOL</span><span class="lo-accent"> MANAGER</span></div>
+        <button class="nav-btn active" onclick="showView('main')">홈</button>
+        <button class="nav-btn" onclick="showView('stats')">전적 분석</button>
+        <button class="nav-btn" onclick="showView('player')">선수 명단</button>
+        <button class="nav-btn" onclick="showView('teamMaker')">팀 짜기</button>
+        <button class="nav-btn" onclick="showView('roulette')">룰렛</button>
+    </div>
+</header>
+
+<datalist id="playerList"></datalist>
+
+<div class="app-body">
+
+    <!-- HOME -->
+    <div id="mainView" class="view-section" style="display:block;">
+        <div class="page-title">Match Record</div>
+        <div class="page-sub">경기 결과를 기록합니다</div>
+
+        <div style="margin-bottom:16px;">
+            <input type="date" id="matchDate" style="width:160px;">
+        </div>
+
+        <div class="match-grid">
+            <div class="team-card blue">
+                <div class="team-label">BLUE TEAM</div>
+                <div id="blueTeamInputs"></div>
+            </div>
+            <div class="team-card red">
+                <div class="team-label">RED TEAM</div>
+                <div id="redTeamInputs"></div>
+            </div>
+        </div>
+
+        <div class="winner-row">
+            <button class="win-btn blue" onclick="selectWinner('Blue')">블루팀 승리</button>
+            <button class="win-btn red" onclick="selectWinner('Red')">레드팀 승리</button>
+        </div>
+
+        <div class="action-row">
+            <button class="btn-primary" id="mainSaveBtn" onclick="saveMatch()">기록 저장</button>
+            <button class="btn-secondary" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">수정 취소</button>
+        </div>
+
+        <div class="section-title">Recent Matches</div>
+        <table id="logTable">
+            <thead><tr><th width="12%">날짜</th><th width="32%">블루팀</th><th width="10%">결과</th><th width="32%">레드팀</th><th width="14%">관리</th></tr></thead>
+            <tbody><tr><td colspan="5" style="color:var(--text-dim)">로딩 중...</td></tr></tbody>
+        </table>
+        <div class="pagination">
+            <button class="page-btn" onclick="changePage(-1)">이전</button>
+            <span id="pageIndicator" class="page-info">1 / 1</span>
+            <button class="page-btn" onclick="changePage(1)">다음</button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="statsView" class="view-section">
+        <div id="statsContent" class="stat-container">
+            <div style="text-align:center; padding:40px; color:var(--text-dim);">데이터 로딩 중...</div>
+        </div>
+    </div>
+
+    <!-- PLAYER -->
+    <div id="playerView" class="view-section">
+        <div class="page-title">Player Roster</div>
+        <div class="page-sub">선수 등록 및 티어 관리</div>
+        <div class="player-form-row">
+            <input type="text" id="newPlayerName" placeholder="소환사명" style="width:180px;">
+            <select id="newPlayerTier">
+                <option value="D1">Diamond 1</option><option value="D2">Diamond 2</option><option value="D3">Diamond 3</option><option value="D4">Diamond 4</option>
+                <option value="E1">Emerald 1</option><option value="E2">Emerald 2</option><option value="E3">Emerald 3</option><option value="E4">Emerald 4</option>
+                <option value="P1">Platinum 1</option><option value="P2">Platinum 2</option><option value="P3">Platinum 3</option><option value="P4">Platinum 4</option>
+                <option value="G1">Gold 1</option><option value="G2">Gold 2</option><option value="G3">Gold 3</option><option value="G4" selected>Gold 4</option>
+                <option value="S1">Silver 1</option>
+            </select>
+            <button class="btn-primary" onclick="savePlayer()">저장</button>
+        </div>
+        <table id="playerTable">
+            <thead><tr><th>소환사</th><th>티어</th><th>점수</th><th>관리</th></tr></thead>
+            <tbody><tr><td colspan="4" style="color:var(--text-dim)">...</td></tr></tbody>
+        </table>
+    </div>
+
+    <!-- TEAM MAKER -->
+    <div id="teamMakerView" class="view-section">
+        <div class="page-title">Team Balancer</div>
+        <div class="page-sub">티어점수 30% + 승률 70% 기반 MMR 밸런싱 (뭐 꼬우면 말하소 바꿀랑께)</div>
+        <div class="tm-input-grid" id="tmInputGrid"></div>
+        <div class="action-row">
+            <button class="btn-primary" onclick="makeBalancedTeam()">밸런스 팀 생성</button>
+            <button class="btn-secondary" onclick="resetTeamInputs()">초기화</button>
+        </div>
+        <div id="tmResultBox" style="display:none;">
+            <div class="tm-teams-wrap">
+                <div class="tm-team blue">
+                    <div class="tm-team-label" style="color:var(--accent-blue)">TEAM A</div>
+                    <div id="tmListA"></div>
+                    <div id="tmScoreA" class="tm-score-total"></div>
+                </div>
+                <div class="tm-team red">
+                    <div class="tm-team-label" style="color:var(--accent-red)">TEAM B</div>
+                    <div id="tmListB"></div>
+                    <div id="tmScoreB" class="tm-score-total"></div>
+                </div>
+            </div>
+            <div id="tmDiff" class="tm-diff"></div>
+            <div class="action-row" style="margin-top:16px;">
+                <button class="btn-secondary" onclick="applyTeamToMain()">이 대진으로 입력하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROULETTE -->
+    <div id="rouletteView" class="view-section">
+        <div class="page-title">Support Roulette</div>
+        <div class="page-sub">서포터 룰렛</div>
+        <div class="card">
+            <div class="roulette-inputs">
+                <input type="text" id="rlName0" placeholder="참가자 1" list="playerList">
+                <input type="text" id="rlName1" placeholder="참가자 2" list="playerList">
+                <input type="text" id="rlName2" placeholder="참가자 3" list="playerList">
+                <input type="text" id="rlName3" placeholder="참가자 4" list="playerList">
+                <input type="text" id="rlName4" placeholder="참가자 5" list="playerList">
+            </div>
+            <div class="roulette-display" id="rouletteDisplay">?</div>
+            <div style="text-align:center;">
+                <button class="btn-primary" onclick="startRoulette()">돌리기</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJIy6VSqnMA76I5APtmUp_Elxehv0zZKYqQ4ZDq0atPBhW-BUiYXwOnbSQrFfB2l7i5Q/exec";
+
+    const TIER_POINTS = {
+        'D1':100,'D2':95,'D3':90,'D4':85,
+        'E1':80,'E2':75,'E3':70,'E4':65,
+        'P1':60,'P2':55,'P3':50,'P4':45,
+        'G1':40,'G2':35,'G3':30,'G4':25,
+        'S1':15
+    };
+
+    let matches = [];
+    let playerDB = [];
+    let selectedWinner = null;
+    let editingId = null;
+    let currentPage = 1;
+    const itemsPerPage = 5;
+    let selectedStatPlayer = null;
+
+    setTodayKST();
+    initForms();
+    initTeamMakerInputs();
+    fetchData();
+
+    // === NAV ===
+    function showView(viewId) {
+        document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+        document.getElementById(viewId + 'View').style.display = 'block';
+        const btns = document.querySelectorAll('.nav-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        const map = {main:0, stats:1, player:2, teamMaker:3, roulette:4};
+        if(map[viewId] !== undefined) btns[map[viewId]].classList.add('active');
+        if(viewId === 'stats') renderStatsDashboard();
+    }
+
+    function fetchData() {
+        fetch(GOOGLE_SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            matches = data.matches || [];
+            playerDB = data.players || [];
+            currentPage = 1;
+            renderAll();
+            renderPlayerTable();
+            updateDatalist();
+        })
+        .catch(err => console.error("Data Fetch Error:", err));
+    }
+
+    // === HOME ===
+    function setTodayKST() {
+        const now = new Date();
+        const kst = new Date(now.getTime() + (9*60*60000) + (now.getTimezoneOffset()*60000));
+        document.getElementById('matchDate').value = kst.toISOString().split('T')[0];
+    }
+    function initForms() {
+        const createRows = (cid, pfix) => {
+            let h=''; for(let i=0;i<5;i++) h+=`<div class="player-row"><input type="text" class="player-input" id="${pfix}Name${i}" placeholder="소환사" list="playerList"><input type="text" class="champ-input" id="${pfix}Champ${i}" placeholder="챔피언"></div>`;
+            document.getElementById(cid).innerHTML=h;
+        };
+        createRows('blueTeamInputs','blue'); createRows('redTeamInputs','red');
+    }
+    function formatName(n) {
+        return n==='류승권' ? `${n}<span class="host-mark">HOST</span>` : n;
+    }
+    function selectWinner(t) {
+        selectedWinner=t;
+        document.querySelectorAll('.win-btn').forEach(b=>b.classList.remove('selected'));
+        if(t==='Blue') document.querySelector('.win-btn.blue').classList.add('selected');
+        else document.querySelector('.win-btn.red').classList.add('selected');
+    }
+
+    function saveMatch() {
+        if(!selectedWinner) return alert("승리팀을 선택하세요.");
+        const date = document.getElementById('matchDate').value;
+        const blue=[], red=[];
+        for(let i=0;i<5;i++) {
+            let bn=document.getElementById(`blueName${i}`).value.trim(), bc=document.getElementById(`blueChamp${i}`).value.trim();
+            if(bn) blue.push({name:bn, champ:bc||'?'});
+            let rn=document.getElementById(`redName${i}`).value.trim(), rc=document.getElementById(`redChamp${i}`).value.trim();
+            if(rn) red.push({name:rn, champ:rc||'?'});
+        }
+        if(blue.length<1 || red.length<1) return alert("팀원을 입력하세요.");
+        const id = editingId || Date.now();
+        const action = editingId ? 'update' : 'save';
+        sendPost({id, action, date, blue, red, winner: selectedWinner}, () => {
+            alert("저장되었습니다.");
+            if(editingId) cancelEdit();
+            fetchData();
+        });
+    }
+
+    function sendPost(data, callback) {
+        document.getElementById('mainSaveBtn').disabled = true;
+        fetch(GOOGLE_SCRIPT_URL, {
+            method:'POST', mode:'no-cors',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(data)
+        }).then(() => {
+            document.getElementById('mainSaveBtn').disabled = false;
+            callback();
+        });
+    }
+
+    function renderAll() {
+        const tbody = document.querySelector('#logTable tbody');
+        tbody.innerHTML='';
+        const sorted = matches.slice().sort((a,b) => new Date(b.date)-new Date(a.date) || b.id-a.id);
+        if(sorted.length===0) {
+            tbody.innerHTML='<tr><td colspan="5" style="color:var(--text-dim)">기록 없음</td></tr>';
+            document.getElementById('pageIndicator').innerText = "1 / 1";
+        } else {
+            const totalPages = Math.ceil(sorted.length / itemsPerPage);
+            if(currentPage<1) currentPage=1;
+            if(currentPage>totalPages) currentPage=totalPages;
+            const start = (currentPage-1)*itemsPerPage;
+            const pageData = sorted.slice(start, start+itemsPerPage);
+            pageData.forEach(m => {
+                const w = m.winner==='Blue';
+                const row = `<tr>
+                    <td style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted)">${m.date}</td>
+                    <td class="team-cell">${m.blue.map(p=>`<div>${formatName(p.name)} <small>${p.champ}</small></div>`).join('')}</td>
+                    <td><span class="result-badge ${w?'blue':'red'}">${w?'BLUE':'RED'}</span></td>
+                    <td class="team-cell">${m.red.map(p=>`<div>${formatName(p.name)} <small>${p.champ}</small></div>`).join('')}</td>
+                    <td><button class="btn-mini" onclick="editMatch(${m.id})">수정</button> <button class="btn-mini danger" onclick="deleteMatch(${m.id})">삭제</button></td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+            document.getElementById('pageIndicator').innerText = `${currentPage} / ${totalPages}`;
+        }
+    }
+    function changePage(step) { currentPage += step; renderAll(); }
+    function editMatch(id) {
+        const m = matches.find(x=>x.id===id); if(!m)return;
+        editingId=id; document.getElementById('matchDate').value=m.date; selectWinner(m.winner); initForms();
+        m.blue.forEach((p,i)=>{document.getElementById(`blueName${i}`).value=p.name; document.getElementById(`blueChamp${i}`).value=p.champ;});
+        m.red.forEach((p,i)=>{document.getElementById(`redName${i}`).value=p.name; document.getElementById(`redChamp${i}`).value=p.champ;});
+        document.getElementById('mainSaveBtn').innerText="수정 저장";
+        document.getElementById('cancelEditBtn').style.display='inline-block';
+        window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function cancelEdit() {
+        editingId=null; setTodayKST(); initForms(); selectedWinner=null;
+        document.querySelectorAll('.win-btn').forEach(b=>b.classList.remove('selected'));
+        document.getElementById('mainSaveBtn').innerText="기록 저장";
+        document.getElementById('cancelEditBtn').style.display='none';
+    }
+    function deleteMatch(id) {
+        if(!confirm("삭제합니까?")) return;
+        sendPost({action:'delete', id}, () => {alert("삭제됨"); fetchData();});
+    }
+
+    // === PLAYER ===
+    function savePlayer() {
+        const name = document.getElementById('newPlayerName').value.trim();
+        const tier = document.getElementById('newPlayerTier').value;
+        if(!name) return alert("소환사명을 입력하세요.");
+        sendPost({action:'savePlayer', name, tier}, () => {
+            alert("저장되었습니다.");
+            document.getElementById('newPlayerName').value='';
+            fetchData();
+        });
+    }
+    function deletePlayer(name) {
+        if(!confirm(`${name} 선수를 삭제합니까?`)) return;
+        sendPost({action:'deletePlayer', name}, () => {alert("삭제됨"); fetchData();});
+    }
+    function editPlayer(name) {
+        const p = playerDB.find(x=>x.name===name);
+        if(p) {
+            document.getElementById('newPlayerName').value=p.name;
+            document.getElementById('newPlayerTier').value=p.tier;
+            document.getElementById('newPlayerName').focus();
+            alert(name+" 님의 정보를 수정합니다. 티어를 변경하고 [저장]을 눌러주세요.");
+        }
+    }
+    function renderPlayerTable() {
+        const tbody = document.querySelector('#playerTable tbody');
+        playerDB.sort((a,b)=>TIER_POINTS[b.tier]-TIER_POINTS[a.tier]);
+        tbody.innerHTML = playerDB.map(p => {
+            const tClass = `tier-${p.tier.charAt(0)}`;
+            return `<tr>
+                <td style="font-weight:700;">${p.name}</td>
+                <td><span class="tier-badge ${tClass}">${p.tier}</span></td>
+                <td style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted)">${TIER_POINTS[p.tier]||0}</td>
+                <td><button onclick="editPlayer('${p.name}')" class="btn-mini">수정</button> <button onclick="deletePlayer('${p.name}')" class="btn-mini danger">삭제</button></td>
+            </tr>`;
+        }).join('') || '<tr><td colspan="4" style="color:var(--text-dim)">등록된 선수가 없습니다.</td></tr>';
+    }
+    function updateDatalist() {
+        const dl = document.getElementById('playerList'); dl.innerHTML='';
+        const set = new Set([...matches.flatMap(m=>[...m.blue,...m.red].map(p=>p.name)),...playerDB.map(p=>p.name)]);
+        set.forEach(n => {const op=document.createElement('option'); op.value=n; dl.appendChild(op);});
+    }
+
+    // === TEAM MAKER ===
+    function initTeamMakerInputs() {
+        let h=''; for(let i=0;i<10;i++) h+=`<input type="text" id="tmName${i}" placeholder="참가자 ${i+1}" list="playerList">`;
+        document.getElementById('tmInputGrid').innerHTML=h;
+    }
+    function resetTeamInputs() {
+        for(let i=0;i<10;i++) document.getElementById(`tmName${i}`).value='';
+        document.getElementById('tmResultBox').style.display='none';
+    }
+    function getTierScore(name) {
+        const p = playerDB.find(x=>x.name===name);
+        return p ? (TIER_POINTS[p.tier]||25) : 25;
+    }
+    function getWinRateScore(name) {
+        let w=0,t=0;
+        matches.forEach(m => {
+            if(m.blue.some(p=>p.name===name)){t++;if(m.winner==='Blue')w++;}
+            if(m.red.some(p=>p.name===name)){t++;if(m.winner==='Red')w++;}
+        });
+        return t===0 ? 50 : (w/t*100);
+    }
+    function makeBalancedTeam() {
+        let players = [];
+        for(let i=0;i<10;i++) {
+            const name = document.getElementById(`tmName${i}`).value.trim();
+            if(name) {
+                const tierScore = getTierScore(name);
+                const winScore = getWinRateScore(name);
+                const wTier = tierScore*0.30;
+                const wWin = winScore*0.70;
+                const mmr = wTier+wWin;
+                players.push({name, mmr, tier:(playerDB.find(x=>x.name===name)?.tier||'UN'), wTier, wWin});
+            }
+        }
+        if(players.length!==10) return alert("10명을 모두 입력해주세요.");
+        let bestDiff=Infinity, bestA=[], bestB=[];
+        const combine = (start, team) => {
+            if(team.length===5) {
+                const teamA=team;
+                const teamB=players.filter(p=>!teamA.includes(p));
+                const sA=teamA.reduce((s,p)=>s+p.mmr,0);
+                const sB=teamB.reduce((s,p)=>s+p.mmr,0);
+                const diff=Math.abs(sA-sB);
+                if(diff<bestDiff){bestDiff=diff; bestA=teamA; bestB=teamB;}
+                return;
+            }
+            for(let i=start;i<10;i++) combine(i+1,[...team,players[i]]);
+        };
+        combine(0,[]);
+        renderTeamResult(bestA, bestB);
+    }
+    function renderTeamResult(teamA, teamB) {
+        const render = team => team.map(p =>
+            `<div class="tm-player">
+                <div class="tm-player-info">
+                    <div><span style="font-weight:700;">${p.name}</span> <span style="color:var(--text-dim); font-size:11px;">${p.tier}</span></div>
+                    <div class="tm-player-calc">tier(${Math.round(p.wTier)}) + wr(${Math.round(p.wWin)})</div>
+                </div>
+                <span class="tm-player-score">${Math.round(p.mmr)}</span>
+            </div>`
+        ).join('');
+        document.getElementById('tmListA').innerHTML = render(teamA);
+        document.getElementById('tmListB').innerHTML = render(teamB);
+        const scoreA = Math.round(teamA.reduce((a,b)=>a+b.mmr,0));
+        const scoreB = Math.round(teamB.reduce((a,b)=>a+b.mmr,0));
+        document.getElementById('tmScoreA').innerText = `Total: ${scoreA}`;
+        document.getElementById('tmScoreB').innerText = `Total: ${scoreB}`;
+        document.getElementById('tmDiff').innerText = `DIFF: ${Math.abs(scoreA-scoreB)}`;
+        document.getElementById('tmResultBox').style.display = 'block';
+        window.genTeamA = teamA; window.genTeamB = teamB;
+    }
+    function applyTeamToMain() {
+        if(!window.genTeamA) return;
+        showView('main'); initForms();
+        window.genTeamA.forEach((p,i)=>document.getElementById(`blueName${i}`).value=p.name);
+        window.genTeamB.forEach((p,i)=>document.getElementById(`redName${i}`).value=p.name);
+    }
+
+    // === STATS DASHBOARD ===
+    function pct(w,l){const t=w+l; return t>0?(w/t)*100:0;}
+    function wrc(v){return v>=55?"#22c55e":v>=45?"#eab308":"#ef4444";}
+    function makeBar(w,l,h=5){
+        const r=pct(w,l); const c=wrc(r);
+        return `<div class="bar-wrap"><div class="bar-bg" style="height:${h}px"><div class="bar-fill" style="width:${r}%;background:${c};height:${h}px"></div></div><span class="bar-pct" style="color:${c}">${r.toFixed(0)}%</span></div>`;
+    }
+
+    function renderStatsDashboard() {
+        if(!matches||matches.length===0){
+            document.getElementById('statsContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim);">데이터가 없거나 로딩 중입니다.</div>';
+            return;
+        }
+        const ps={};
+        matches.forEach(g=>{
+            const bw=g.winner==="Blue";
+            [["blue",bw],["red",!bw]].forEach(([side,won])=>{
+                const team=g[side]; const names=team.map(p=>p.name);
+                team.forEach(p=>{
+                    if(!ps[p.name]) ps[p.name]={w:0,l:0,champs:{},with:{}};
+                    won?ps[p.name].w++:ps[p.name].l++;
+                    if(!ps[p.name].champs[p.champ]) ps[p.name].champs[p.champ]={w:0,l:0};
+                    won?ps[p.name].champs[p.champ].w++:ps[p.name].champs[p.champ].l++;
+                    names.forEach(m=>{
+                        if(m===p.name)return;
+                        if(!ps[p.name].with[m]) ps[p.name].with[m]={w:0,l:0};
+                        won?ps[p.name].with[m].w++:ps[p.name].with[m].l++;
+                    });
+                });
+            });
+        });
+
+        const statsList = Object.entries(ps)
+            .map(([n,s])=>({n,...s,t:s.w+s.l,r:pct(s.w,s.l)}))
+            .filter(p=>p.t>=5)
+            .sort((a,b)=>b.r-a.r||b.t-a.t);
+
+        const blueWins = matches.filter(m=>m.winner==="Blue").length;
+        const totalGames = matches.length;
+
+        let h = `<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+            <div class="page-title">Analytics</div>
+            <span class="page-sub" style="margin-bottom:0;">Total ${totalGames} Games / Blue ${blueWins}W / Red ${totalGames-blueWins}W</span>
+        </div>`;
+
+        h += `<div class="stat-grid ${selectedStatPlayer?'two':'one'}">`;
+
+        // Rankings
+        h += `<div class="card"><div class="stat-title">Rankings (5G+)</div>`;
+        statsList.forEach((p,i)=>{
+            const active = selectedStatPlayer===p.n?'active':'';
+            const rankCls = i<3?'stat-rank-top':'stat-rank-norm';
+            h+=`<button class="player-list-btn ${active}" onclick="selectStatPlayer('${p.n}')">
+                <span class="stat-rank-num ${rankCls}">${i+1}</span>
+                <div style="flex:1"><div class="stat-pname">${p.n}</div><div class="stat-psub">${p.w}W ${p.l}L <span style="color:${wrc(p.r)}">${p.r.toFixed(0)}%</span></div></div>
+                <div style="width:56px">${makeBar(p.w,p.l,4)}</div>
+            </button>`;
+        });
+        h+=`</div>`;
+
+        // Detail
+        if(selectedStatPlayer && ps[selectedStatPlayer]){
+            const cur=ps[selectedStatPlayer];
+            const curR=pct(cur.w,cur.l);
+            const champs=Object.entries(cur.champs).map(([c,s])=>({c,...s,t:s.w+s.l,r:pct(s.w,s.l)})).sort((a,b)=>b.t-a.t||b.r-a.r);
+            const mates=Object.entries(cur.with).map(([m,s])=>({m,...s,t:s.w+s.l,r:pct(s.w,s.l)})).filter(d=>d.t>=2).sort((a,b)=>b.r-a.r||b.t-a.t);
+            const userGames=matches.filter(g=>[...g.blue,...g.red].some(p=>p.name===selectedStatPlayer)).sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id-a.id);
+
+            h+=`<div>`;
+            // Profile
+            h+=`<div class="card"><div class="sel-profile">
+                <div class="summary-badge" style="background:linear-gradient(135deg,${wrc(curR)}22,${wrc(curR)}08);border:2px solid ${wrc(curR)}33;color:${wrc(curR)}">${curR.toFixed(0)}</div>
+                <div><div class="stat-pname" style="font-size:17px;">${selectedStatPlayer}</div><div class="stat-psub" style="font-size:11px;">${cur.w+cur.l}G ${cur.w}W ${cur.l}L</div></div>
+            </div>${makeBar(cur.w,cur.l,8)}</div>`;
+            // Champions
+            h+=`<div class="card"><div class="stat-title">Most Champions</div>`;
+            champs.slice(0,10).forEach(c=>{
+                h+=`<div class="stat-row"><span class="stat-row-name">${c.c}</span><div style="flex:1">${makeBar(c.w,c.l)}</div><span class="stat-row-val">${c.w}W ${c.l}L</span></div>`;
+            });
+            h+=`</div>`;
+            // Partners
+            h+=`<div class="card"><div class="stat-title">Best Partners (2G+)</div>`;
+            if(mates.length===0) h+=`<div style="font-size:11px;color:var(--text-dim);">데이터 부족</div>`;
+            mates.slice(0,10).forEach(m=>{
+                h+=`<div class="stat-row"><span class="stat-row-name" style="min-width:60px">${m.m}</span><div style="flex:1">${makeBar(m.w,m.l)}</div><span class="stat-row-val">${m.w}W ${m.l}L</span></div>`;
+            });
+            h+=`</div>`;
+            // History
+            h+=`<div class="card"><div class="stat-title">Match History</div><div class="history-scroll">`;
+            userGames.forEach(g=>{
+                const inBlue=g.blue.some(p=>p.name===selectedStatPlayer);
+                const isWin=(inBlue&&g.winner==="Blue")||(!inBlue&&g.winner==="Red");
+                const myTeam=inBlue?g.blue:g.red;
+                const myChamp=myTeam.find(p=>p.name===selectedStatPlayer)?.champ||'?';
+                const teamMates=myTeam.filter(p=>p.name!==selectedStatPlayer).map(p=>p.name).join(", ");
+                h+=`<div class="match-item"><span class="m-date">${g.date.substring(5)}</span><span class="m-res" style="color:${isWin?'#22c55e':'#ef4444'}">${isWin?'W':'L'}</span><span class="m-champ">${myChamp}</span><span class="m-mates">${teamMates}</span></div>`;
+            });
+            h+=`</div></div>`;
+            h+=`</div>`;
+        }
+        h+=`</div>`;
+        document.getElementById('statsContent').innerHTML=h;
+    }
+
+    function selectStatPlayer(name){
+        selectedStatPlayer=(selectedStatPlayer===name)?null:name;
+        renderStatsDashboard();
+    }
+
+    // === ROULETTE ===
+    let rouletteInterval;
+    function startRoulette(){
+        const inputs=[];
+        for(let i=0;i<5;i++){const v=document.getElementById(`rlName${i}`).value.trim();if(v)inputs.push(v);}
+        if(inputs.length<2) return alert("2명 이상 입력하세요.");
+        const disp=document.getElementById('rouletteDisplay');
+        let cnt=0;
+        if(rouletteInterval) clearInterval(rouletteInterval);
+        rouletteInterval=setInterval(()=>{
+            disp.innerText=inputs[Math.floor(Math.random()*inputs.length)];
+            cnt++;
+            if(cnt>30){clearInterval(rouletteInterval); disp.innerText=inputs[Math.floor(Math.random()*inputs.length)];}
+        },80);
+    }
+</script>
+</body>
+</html>
